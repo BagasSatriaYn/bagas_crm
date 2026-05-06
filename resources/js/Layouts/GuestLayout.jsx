@@ -1,16 +1,15 @@
-import ApplicationLogo from '@/Components/ApplicationLogo';
-import { Link } from '@inertiajs/react';
-
+// GuestLayout tidak digunakan lagi, Auth pages sekarang standalone
+// Layout ini tetap ada untuk fallback jika ada page lain yang menggunakannya
 export default function GuestLayout({ children }) {
     return (
-        <div className="flex min-h-screen flex-col items-center bg-gray-100 pt-6 sm:justify-center sm:pt-0">
-            <div>
-                <Link href="/">
-                    <ApplicationLogo className="h-20 w-20 fill-current text-gray-500" />
-                </Link>
+        <div className="min-h-screen auth-bg flex items-center justify-center p-4">
+            <div className="absolute inset-0 overflow-hidden pointer-events-none">
+                <div className="absolute -top-24 -right-24 w-96 h-96 rounded-full opacity-10"
+                    style={{ background: 'radial-gradient(circle, #3B82F6, transparent)' }} />
+                <div className="absolute -bottom-24 -left-24 w-96 h-96 rounded-full opacity-10"
+                    style={{ background: 'radial-gradient(circle, #06B6D4, transparent)' }} />
             </div>
-
-            <div className="mt-6 w-full overflow-hidden bg-white px-6 py-4 shadow-md sm:max-w-md sm:rounded-lg">
+            <div className="relative w-full max-w-md">
                 {children}
             </div>
         </div>
