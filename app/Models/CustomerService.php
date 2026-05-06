@@ -6,5 +6,19 @@ use Illuminate\Database\Eloquent\Model;
 
 class CustomerService extends Model
 {
-    //
+    protected $fillable = [
+        'customer_id',
+        'product_id',
+        'deal_price',
+    ];
+
+    public function customer()
+    {
+        return $this->belongsTo(Customer::class);
+    }
+
+    public function product()
+    {
+        return $this->belongsTo(Product::class);
+    }
 }
