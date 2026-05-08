@@ -21,10 +21,16 @@ else
 fi
 
 echo "==> [5/5] Starting services via Supervisor..."
+# Background loop untuk cek port setelah startup
+(
+    sleep 5
+    echo "==> [Background] Checking ports after startup..."
+    netstat -tulpn
+    echo "==> [Background] Checking if index.php exists..."
+    ls -l /var/www/html/public/index.php
+) &
+
 mkdir -p /var/log/supervisor
-# Debug: Cek apakah ada yang mendengarkan di port 9000 (PHP-FPM) nantinya
-echo "==> Checking network status..."
-netstat -tulpn || echo "netstat not found"
 
 # Ganti port 80 di nginx.conf dengan port dari Railway ($PORT)
 NGINX_PORT="${PORT:-80}"
