@@ -49,6 +49,17 @@ class DashboardController extends Controller
             ->get()
             ->pluck('count', 'status');
 
+        // Project status breakdown
+        $projectStatusBreakdown = (clone $projectsQuery)
+            ->selectRaw('status, count(*) as count')
+            ->groupBy('status')
+            ->get()
+            ->pluck('count', 'status');
+
+        // Conversion rate
+        $convertedLeads = (clone $leadsQuery)->where('status', 'converted')->count();
+        $conversionRate = $totalLeads > 0 ? round(($convertedLeads / $totalLeads) * 100, 1) : 0;
+
         return Inertia::render('Dashboard', [
             'stats' => [
                 'total_leads'       => $totalLeads,
@@ -56,9 +67,11 @@ class DashboardController extends Controller
                 'total_customers'   => $totalCustomers,
                 'waiting_approval'  => $waitingApproval,
             ],
-            'recentLeads'           => $recentLeads,
-            'recentProjects'        => $recentProjects,
-            'leadStatusBreakdown'   => $leadStatusBreakdown,
+            'recentLeads'               => $recentLeads,
+            'recentProjects'            => $recentProjects,
+            'leadStatusBreakdown'       => $leadStatusBreakdown,
+            'projectStatusBreakdown'    => $projectStatusBreakdown,
+            'conversionRate'            => $conversionRate,
         ]);
     }
 }
