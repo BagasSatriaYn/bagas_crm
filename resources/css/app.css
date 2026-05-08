@@ -65,7 +65,8 @@
         width: var(--sidebar-width);
         background: var(--sidebar-bg);
         border-right: 1px solid var(--sidebar-border);
-        transition: transform 0.3s ease;
+        transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        transform: translateX(0);
     }
 
     .sidebar-logo {
@@ -123,15 +124,24 @@
         @apply min-h-screen;
         margin-left: var(--sidebar-width);
         background: var(--content-bg);
+        min-width: 0;
     }
 
     .topbar {
-        @apply sticky top-0 z-30 flex items-center justify-between px-6 py-3 bg-white border-b;
+        @apply sticky top-0 z-30 flex items-center justify-between px-4 py-3 bg-white border-b;
         border-color: var(--card-border);
         box-shadow: 0 1px 3px rgba(0,0,0,0.04);
     }
 
-    .page-container { @apply p-6; }
+    .page-container { @apply p-4 md:p-6; }
+
+    /* ── Page Header ─────────────────────────────────── */
+    .page-header {
+        @apply flex flex-wrap items-start gap-3 justify-between mb-6;
+    }
+
+    .page-title { @apply text-xl font-bold text-slate-800; }
+    .page-subtitle { @apply text-sm text-slate-500 mt-0.5; }
 
     /* ── Cards ──────────────────────────────────────── */
     .card {
@@ -259,13 +269,11 @@
     .alert-warning { @apply alert bg-amber-50 border border-amber-200 text-amber-800; }
     .alert-info    { @apply alert bg-blue-50 border border-blue-200 text-blue-800; }
 
-    /* ── Page Header ─────────────────────────────────── */
-    .page-header {
-        @apply flex items-center justify-between mb-6;
+    /* ── Table Responsive ────────────────────────────── */
+    .table-responsive {
+        @apply w-full overflow-x-auto -mx-0;
+        -webkit-overflow-scrolling: touch;
     }
-
-    .page-title { @apply text-xl font-bold text-slate-800; }
-    .page-subtitle { @apply text-sm text-slate-500 mt-0.5; }
 
     /* ── Animations ──────────────────────────────────── */
     .fade-in {
@@ -349,4 +357,178 @@
 
     .w-4\.5 { width: 1.125rem; }
     .h-4\.5 { height: 1.125rem; }
+}
+
+/* ── Responsive Breakpoints ──────────────────────────────── */
+
+/* Mobile: max-width 767px */
+@media (max-width: 767px) {
+    /* Sidebar: hidden by default, shown when mobileOpen */
+    .sidebar {
+        transform: translateX(-100%);
+    }
+    .sidebar.open {
+        transform: translateX(0);
+    }
+
+    /* Main content: no left margin on mobile */
+    .main-content {
+        margin-left: 0 !important;
+    }
+
+    /* Topbar: smaller padding on mobile */
+    .topbar {
+        padding-left: 1rem;
+        padding-right: 1rem;
+    }
+
+    /* Page container: tighter padding */
+    .page-container {
+        padding: 1rem;
+    }
+
+    /* Page header: stack vertically */
+    .page-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.75rem;
+        margin-bottom: 1rem;
+    }
+    .page-header > *:last-child {
+        width: 100%;
+    }
+    .page-header .btn-primary,
+    .page-header .btn-accent,
+    .page-header .btn-outline,
+    .page-header button {
+        width: 100%;
+        justify-content: center;
+    }
+
+    /* Card header: allow wrap */
+    .card-header {
+        flex-wrap: wrap;
+        gap: 0.5rem;
+    }
+
+    /* Card body: smaller padding */
+    .card-body {
+        padding: 1rem;
+    }
+
+    /* Stat cards: full width numbers */
+    .stat-card-value {
+        font-size: 1.75rem;
+    }
+
+    /* Pagination: compact */
+    .pagination {
+        gap: 0.125rem;
+    }
+    .pagination-btn {
+        width: 2rem;
+        height: 2rem;
+        font-size: 0.75rem;
+    }
+
+    /* Modal: full width on mobile */
+    .modal-box {
+        margin: 1rem;
+        padding: 1.25rem;
+    }
+
+    /* Form filter: stack vertically */
+    .filter-form {
+        flex-direction: column;
+    }
+    .filter-form > * {
+        width: 100%;
+    }
+
+    /* Auth card: smaller padding */
+    .auth-card {
+        padding: 1.5rem;
+        border-radius: 1rem;
+    }
+
+    /* Table: force horizontal scroll with min-width */
+    .data-table {
+        min-width: 500px;
+    }
+
+    /* Status banner: wrap actions */
+    .status-banner-actions {
+        margin-left: 0 !important;
+        margin-top: 0.75rem;
+        width: 100%;
+        display: flex;
+        justify-content: flex-start;
+    }
+}
+
+/* Tablet: 768px - 1023px */
+@media (min-width: 768px) and (max-width: 1023px) {
+    :root {
+        --sidebar-width: 220px;
+    }
+
+    .page-container {
+        padding: 1.25rem;
+    }
+
+    .topbar {
+        padding-left: 1.25rem;
+        padding-right: 1.25rem;
+    }
+
+    /* Page header: allow wrap on tablet */
+    .page-header {
+        flex-wrap: wrap;
+        gap: 0.75rem;
+    }
+
+    /* Stat cards grid: 2 cols on tablet */
+    .stat-grid-tablet {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+/* Desktop: 1024px+ */
+@media (min-width: 1024px) {
+    .main-content {
+        margin-left: var(--sidebar-width);
+    }
+}
+
+/* Small mobile: max-width 479px */
+@media (max-width: 479px) {
+    .page-title {
+        font-size: 1.125rem;
+    }
+
+    .card-body {
+        padding: 0.875rem;
+    }
+
+    .topbar {
+        padding-left: 0.875rem;
+        padding-right: 0.875rem;
+    }
+
+    /* Pagination info: hide on very small */
+    .pagination-info {
+        display: none;
+    }
+
+    /* Stat card: adjust icon size */
+    .stat-card-icon {
+        width: 2.5rem;
+        height: 2.5rem;
+    }
+
+    /* Badge: smaller text */
+    .badge {
+        font-size: 0.65rem;
+        padding: 0.125rem 0.5rem;
+    }
 }
