@@ -22,6 +22,9 @@ fi
 
 echo "==> [5/5] Starting services via Supervisor..."
 mkdir -p /var/log/supervisor
+# Debug: Cek apakah ada yang mendengarkan di port 9000 (PHP-FPM) nantinya
+echo "==> Checking network status..."
+netstat -tulpn || echo "netstat not found"
 
 # Ganti port 80 di nginx.conf dengan port dari Railway ($PORT)
 NGINX_PORT="${PORT:-80}"
