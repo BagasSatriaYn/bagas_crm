@@ -23,9 +23,10 @@ fi
 echo "==> [5/5] Starting services via Supervisor..."
 mkdir -p /var/log/supervisor
 
+# Ganti port 80 di nginx.conf dengan port dari Railway ($PORT)
 NGINX_PORT="${PORT:-80}"
-sed -i "s/listen 80;/listen ${NGINX_PORT};/g" /etc/nginx/nginx.conf
-echo "     Nginx will listen on port: $NGINX_PORT"
+sed -i "s/listen [0-9]\+;/listen ${NGINX_PORT};/g" /etc/nginx/nginx.conf
+echo "==> Nginx configured to listen on port: $NGINX_PORT"
 
 chmod -R 777 /var/www/html/storage /var/www/html/bootstrap/cache
 chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
