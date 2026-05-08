@@ -34,8 +34,12 @@ mkdir -p /var/log/supervisor
 
 # Ganti port 80 di nginx.conf dengan port dari Railway ($PORT)
 NGINX_PORT="${PORT:-80}"
-sed -i "s/listen [0-9]\+;/listen ${NGINX_PORT};/g" /etc/nginx/nginx.conf
-echo "==> Nginx configured to listen on port: $NGINX_PORT"
+sed -i "s/listen [0-9]\+;/listen 0.0.0.0:${NGINX_PORT};/g" /etc/nginx/nginx.conf
+echo "==> Nginx configured to listen on 0.0.0.0:$NGINX_PORT"
+
+# Tes konfigurasi nginx
+echo "==> Testing Nginx configuration..."
+nginx -t
 
 chmod -R 777 /var/www/html/storage /var/www/html/bootstrap/cache
 chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
