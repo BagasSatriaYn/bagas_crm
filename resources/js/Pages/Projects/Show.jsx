@@ -47,13 +47,13 @@ export default function ProjectShow({ project }) {
             </div>
 
             {/* Status Banner */}
-            <div className={`rounded-xl p-4 mb-5 border flex items-center gap-4 ${
+            <div className={`rounded-xl p-4 mb-5 border flex flex-wrap items-start gap-3 ${
                 project.status === 'approved' ? 'bg-emerald-50 border-emerald-200' :
                 project.status === 'rejected' ? 'bg-red-50 border-red-200' :
                 'bg-amber-50 border-amber-200'
             }`}>
                 <StatusBadge status={project.status} type="project" />
-                <div className="text-sm">
+                <div className="text-sm flex-1">
                     {project.status === 'waiting approval' && 'Menunggu persetujuan Manager.'}
                     {project.status === 'approved' && 'Project telah disetujui. Dapat dikonversi menjadi customer.'}
                     {project.status === 'rejected' && (
@@ -63,7 +63,7 @@ export default function ProjectShow({ project }) {
 
                 {/* Manager Actions */}
                 {isManager && project.status === 'waiting approval' && (
-                    <div className="ml-auto flex gap-2">
+                    <div className="flex gap-2 ml-auto">
                         <button onClick={handleApprove} className="btn-success btn-sm">✓ Approve</button>
                         <button onClick={() => setShowRejectModal(true)} className="btn-danger btn-sm">✕ Reject</button>
                     </div>

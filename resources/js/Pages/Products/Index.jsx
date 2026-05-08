@@ -100,8 +100,8 @@ export default function ProductsIndex({ products, filters }) {
                     )}
                 </div>
                 {products.last_page > 1 && (
-                    <div className="flex items-center justify-between px-6 py-4 border-t border-slate-100">
-                        <div className="text-sm text-slate-500">
+                    <div className="flex flex-wrap items-center justify-between gap-2 px-4 md:px-6 py-4 border-t border-slate-100">
+                        <div className="pagination-info text-sm text-slate-500">
                             Menampilkan {products.from}–{products.to} dari {products.total} produk
                         </div>
                         <div className="pagination">
