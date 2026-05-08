@@ -30,7 +30,7 @@ export default function Login({ status, canResetPassword }) {
                     <div className="text-center mb-8">
                     {/* Menggunakan tag img untuk memanggil gambar dari folder public */}
                     <img 
-                        src="/images/smart-logo.png" 
+                        src="/images/logo-ptsmart2.png" 
                         alt="Logo PT Smart" 
                         className="w-28 h-auto mx-auto mb-4 object-contain"
                     />

@@ -97,15 +97,14 @@ export default function AuthenticatedLayout({ header, children }) {
 
             {/* Sidebar */}
             <aside
-                className={`sidebar ${mobileOpen ? 'translate-x-0' : '-translate-x-full'} md:translate-x-0`}
+                className={`sidebar${mobileOpen ? ' open' : ''}`}
             >
                 {/* Logo */}
                 <div className="sidebar-logo">
-                    {/* SVG dan div pembungkus icon dihapus, langsung panggil img */}
-                    <img 
-                        src="/images/smart-logo.png" 
-                        alt="Logo Mini PT Smart" 
-                        className="w-14 h-auto object-contain" 
+                    <img
+                        src="/images/logo-ptsmart2.png"
+                        alt="Logo Mini PT Smart"
+                        className="w-14 h-auto object-contain"
                     />
                     <div>
                         <div className="sidebar-logo-text">PT. Smart</div>
@@ -135,7 +134,7 @@ export default function AuthenticatedLayout({ header, children }) {
 
                 {/* Footer */}
                 <div className="sidebar-footer">
-                    <div className="flex items-center gap-3 mb-3">
+                    {/* <div className="flex items-center gap-3 mb-3">
                         <div className="w-8 h-8 rounded-full bg-gradient-primary flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
                             {user.name.charAt(0).toUpperCase()}
                         </div>
@@ -145,7 +144,7 @@ export default function AuthenticatedLayout({ header, children }) {
                                 {user.role === 'manager' ? 'Manager' : 'Sales'}
                             </div>
                         </div>
-                    </div>
+                    </div> */}
                     <Link
                         href={route('logout')}
                         method="post"
@@ -167,11 +166,12 @@ export default function AuthenticatedLayout({ header, children }) {
             <div className="main-content flex-1">
                 {/* Topbar */}
                 <header className="topbar">
-                    <div className="flex items-center gap-4">
+                    <div className="flex items-center gap-3 min-w-0">
                         {/* Mobile hamburger */}
                         <button
-                            className="md:hidden p-2 rounded-lg text-slate-500 hover:bg-slate-100"
+                            className="md:hidden p-2 rounded-lg text-slate-500 hover:bg-slate-100 flex-shrink-0"
                             onClick={() => setMobileOpen(true)}
+                            aria-label="Buka menu"
                         >
                             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h16" />
@@ -179,29 +179,40 @@ export default function AuthenticatedLayout({ header, children }) {
                         </button>
 
                         {header && (
-                            <div className="text-sm text-slate-500">
+                            <div className="text-sm text-slate-500 truncate">
                                 {header}
                             </div>
                         )}
                     </div>
 
                     {/* Right topbar */}
-                    <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-3 flex-shrink-0">
                         <Link
                             href={route('profile.edit')}
-                            className="flex items-center gap-2 px-3 py-1.5 rounded-lg hover:bg-slate-100 transition-colors"
+                            className="flex items-center gap-2 px-2 py-1.5 rounded-lg hover:bg-slate-100 transition-colors"
                         >
-                            <div className="w-7 h-7 rounded-full bg-gradient-primary flex items-center justify-center text-white text-xs font-bold">
+                            {/* Avatar Profil */}
+                            <div className="w-8 h-8 rounded-full bg-gradient-primary flex items-center justify-center text-white text-xs font-bold flex-shrink-0 shadow-sm">
                                 {user.name.charAt(0).toUpperCase()}
                             </div>
-                            <span className="text-sm font-medium text-slate-700 hidden sm:block">{user.name}</span>
+                            
+                            {/* Detail Nama & Role */}
+                            <div className="hidden sm:flex flex-col items-start justify-center">
+                                <span className="text-sm font-semibold text-slate-700 max-w-[120px] truncate leading-tight">
+                                    {user.name}
+                                </span>
+                                {/* Badge Role */}
+                                <span className="text-[10px] font-bold text-blue-600 bg-blue-50 px-1.5 py-0.5 mt-0.5 rounded uppercase tracking-wider border border-blue-100">
+                                    {user.role || 'Staff'}
+                                </span>
+                            </div>
                         </Link>
                     </div>
                 </header>
 
                 {/* Flash Messages */}
                 {(flash.success || flash.error) && (
-                    <div className="px-6 pt-4">
+                    <div className="px-4 md:px-6 pt-4">
                         {flash.success && (
                             <div className="alert-success fade-in">
                                 <svg className="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
