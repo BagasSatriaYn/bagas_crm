@@ -22,11 +22,6 @@ fi
 
 echo "==> [5/5] Starting services via Supervisor..."
 mkdir -p /var/log/supervisor
+sed -i "listen 80;/listen ${PORT:-80};/g" /etc/nginx/nginx.conf
 
-NGINX_PORT="${PORT:-80}"
-sed -i "s/listen 80;/listen ${NGINX_PORT};/g" /etc/nginx/nginx.conf
-echo "     Nginx will listen on port: $NGINX_PORT"
-
-chmod -R 777 /var/www/html/storage /var/www/html/bootstrap/cache
-chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
 exec /usr/bin/supervisord -c /etc/supervisor/conf.d/supervisord.conf
