@@ -22,7 +22,9 @@ fi
 
 echo "==> [5/5] Starting services via Supervisor..."
 mkdir -p /var/log/supervisor
-sed -i "listen 80;/listen ${PORT:-80};/g" /etc/nginx/nginx.conf
+
+sed -i 's/listen 80;/listen ${PORT:-80};/g' /etc/nginx/nginx.conf
+
 chmod -R 777 /var/www/html/storage /var/www/html/bootstrap/cache
 chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
 exec /usr/bin/supervisord -c /etc/supervisor/conf.d/supervisord.conf
