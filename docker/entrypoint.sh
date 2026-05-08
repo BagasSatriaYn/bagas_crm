@@ -2,7 +2,6 @@
 set -e
 
 echo "==> [1/5] Generating APP_KEY if missing..."
-php artisan key:generate --no-interaction --force
 
 echo "==> [2/5] Caching config & routes..."
 php artisan config:cache
