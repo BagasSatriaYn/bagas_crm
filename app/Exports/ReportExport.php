@@ -2,135 +2,121 @@
 
 namespace App\Exports;
 
-use App\Models\Customer;
 use App\Models\Lead;
-use App\Models\Project;
 use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\WithHeadings;
-use Maatwebsite\Excel\Concerns\WithMultipleSheets;
+use Maatwebsite\Excel\Concerns\WithMapping;
+use Maatwebsite\Excel\Concerns\ShouldAutoSize;
+use Maatwebsite\Excel\Concerns\WithStyles;
+use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
+use PhpOffice\PhpSpreadsheet\Style\Border;
+use PhpOffice\PhpSpreadsheet\Style\Fill;
+use PhpOffice\PhpSpreadsheet\Style\Alignment;
 
-class ReportExport implements WithMultipleSheets
+class ReportExport implements FromCollection, WithHeadings, WithMapping, ShouldAutoSize, WithStyles
 {
-    public function __construct(
-        private $user,
-        private bool $isManager,
-        private string $startDate,
-        private string $endDate
-    ) {}
+    protected $user;
+    protected $isManager;
+    protected $startDate;
+    protected $endDate;
+    protected $rowNumber = 0; // Untuk penomoran otomatis kolom #
 
-    public function sheets(): array
+    // Menerima data dari ReportController
+    public function __construct($user, $isManager, $startDate, $endDate)
     {
-        return [
-            'Leads'     => new LeadsSheet($this->user, $this->isManager, $this->startDate, $this->endDate),
-            'Projects'  => new ProjectsSheet($this->user, $this->isManager, $this->startDate, $this->endDate),
-            'Customers' => new CustomersSheet($this->user, $this->isManager, $this->startDate, $this->endDate),
-        ];
-    }
-}
-
-class LeadsSheet implements FromCollection, WithHeadings
-{
-    public function __construct(
-        private $user,
-        private bool $isManager,
-        private string $startDate,
-        private string $endDate
-    ) {}
-
-    public function headings(): array
-    {
-        return ['#', 'Nama Lead', 'Kontak', 'Alamat', 'Kebutuhan', 'Status', 'Sales', 'Tanggal'];
+        $this->user = $user;
+        $this->isManager = $isManager;
+        $this->startDate = $startDate;
+        $this->endDate = $endDate;
     }
 
+    // Mengambil data dari Database
     public function collection()
     {
-        $query = Lead::with('user')
+        $leadsQuery = Lead::with('user')
             ->whereBetween('created_at', [$this->startDate . ' 00:00:00', $this->endDate . ' 23:59:59']);
 
         if (!$this->isManager) {
-            $query->where('user_id', $this->user->id);
+            $leadsQuery->where('user_id', $this->user->id);
         }
 
-        return $query->get()->map(fn($lead, $i) => [
-            $i + 1,
+        return $leadsQuery->get();
+    }
+
+    // Mengatur Baris Pertama (Header Excel)
+    public function headings(): array
+    {
+        return [
+            '#',
+            'Nama Lead',
+            'Kontak',
+            'Alamat',
+            'Kebutuhan',
+            'Status',
+            'Sales',
+            'Tanggal',
+        ];
+    }
+
+    // Memetakan isi data per baris
+    public function map($lead): array
+    {
+        $this->rowNumber++;
+
+        return [
+            $this->rowNumber,
             $lead->name,
             $lead->contact,
-            $lead->address,
-            $lead->needs,
+            $lead->address ?? '-',     // Sesuaikan dengan nama kolom DB Anda jika berbeda
+            $lead->requirement ?? '-', // Sesuaikan dengan nama kolom DB Anda jika berbeda
             $lead->status,
             $lead->user->name ?? '-',
             $lead->created_at->format('d/m/Y'),
+        ];
+    }
+
+    // Mengatur Desain (Warna, Border, Lebar)
+    public function styles(Worksheet $sheet)
+    {
+        $highestRow = $sheet->getHighestRow();
+        $highestColumn = $sheet->getHighestColumn();
+
+        // 1. Styling untuk Baris Header (Baris 1)
+        $sheet->getStyle('A1:' . $highestColumn . '1')->applyFromArray([
+            'font' => [
+                'bold' => true,
+                'color' => ['argb' => 'FFFFFFFF'], // Teks Putih
+            ],
+            'fill' => [
+                'fillType' => Fill::FILL_SOLID,
+                'color' => ['argb' => 'FF3B82F6'], // Background Biru (Blue-500)
+            ],
+            'alignment' => [
+                'horizontal' => Alignment::HORIZONTAL_CENTER,
+                'vertical' => Alignment::VERTICAL_CENTER,
+            ],
         ]);
-    }
-}
 
-class ProjectsSheet implements FromCollection, WithHeadings
-{
-    public function __construct(
-        private $user,
-        private bool $isManager,
-        private string $startDate,
-        private string $endDate
-    ) {}
-
-    public function headings(): array
-    {
-        return ['#', 'Lead', 'Status', 'Total Nilai (Rp)', 'Sales', 'Alasan Reject', 'Tanggal'];
-    }
-
-    public function collection()
-    {
-        $query = Project::with(['lead', 'user', 'items'])
-            ->whereBetween('created_at', [$this->startDate . ' 00:00:00', $this->endDate . ' 23:59:59']);
-
-        if (!$this->isManager) {
-            $query->where('user_id', $this->user->id);
-        }
-
-        return $query->get()->map(fn($project, $i) => [
-            $i + 1,
-            $project->lead->name ?? '-',
-            $project->status,
-            $project->items->sum('negotiated_price'),
-            $project->user->name ?? '-',
-            $project->reject_reason ?? '-',
-            $project->created_at->format('d/m/Y'),
+        // 2. Memberikan Garis Tabel (Border) ke semua sel yang terisi data
+        $sheet->getStyle('A1:' . $highestColumn . $highestRow)->applyFromArray([
+            'borders' => [
+                'allBorders' => [
+                    'borderStyle' => Border::BORDER_THIN,
+                    'color' => ['argb' => 'FF000000'], // Garis Hitam Tipis
+                ],
+            ],
         ]);
-    }
-}
 
-class CustomersSheet implements FromCollection, WithHeadings
-{
-    public function __construct(
-        private $user,
-        private bool $isManager,
-        private string $startDate,
-        private string $endDate
-    ) {}
+        // 3. Melebarkan tinggi baris header agar teks tidak terlalu mepet
+        $sheet->getRowDimension(1)->setRowHeight(25);
 
-    public function headings(): array
-    {
-        return ['#', 'Nama Customer', 'Kontak', 'Alamat', 'Jumlah Layanan', 'Total Revenue (Rp)', 'Sales', 'Tanggal'];
-    }
-
-    public function collection()
-    {
-        $query = Customer::with(['services', 'user'])
-            ->whereBetween('created_at', [$this->startDate . ' 00:00:00', $this->endDate . ' 23:59:59']);
-
-        if (!$this->isManager) {
-            $query->where('user_id', $this->user->id);
-        }
-
-        return $query->get()->map(fn($customer, $i) => [
-            $i + 1,
-            $customer->name,
-            $customer->contact,
-            $customer->address,
-            $customer->services->count(),
-            $customer->services->sum('deal_price'),
-            $customer->user->name ?? '-',
-            $customer->created_at->format('d/m/Y'),
+        // 4. (Opsional) Mengatur isi sel agar posisinya di atas (Top) jika ada teks panjang
+        $sheet->getStyle('A2:' . $highestColumn . $highestRow)->applyFromArray([
+            'alignment' => [
+                'vertical' => Alignment::VERTICAL_TOP,
+            ],
         ]);
+
+        return [];
     }
 }
