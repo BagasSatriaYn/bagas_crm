@@ -2,6 +2,9 @@
 set -e
 
 echo "==> [1/5] Generating APP_KEY if missing..."
+if [ -z "$APP_KEY" ]; then
+    php artisan key:generate --force --no-interaction
+fi
 
 echo "==> [2/5] Caching config & routes..."
 php artisan config:cache
@@ -19,6 +22,10 @@ if [ "$LEAD_COUNT" = "0" ]; then
 else
     echo "     Database sudah ada data ($LEAD_COUNT users), skip seeding."
 fi
+
+# Tailing Laravel logs ke stdout agar muncul di Railway
+touch /var/www/html/storage/logs/laravel.log
+tail -f /var/www/html/storage/logs/laravel.log &
 
 echo "==> [5/5] Starting services via Supervisor..."
 # Background loop untuk cek port setelah startup
